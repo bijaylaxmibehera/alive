@@ -1,0 +1,36 @@
+{
+  "name": "alive",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bijaylaxmibehera/alive.git"
+  },
+  "author": "bijaylaxmi behera",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bijaylaxmibehera/alive/issues"
+  },
+  "homepage": "https://github.com/bijaylaxmibehera/alive#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.9.2",
+    "multer": "^1.4.5-lts.1",
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth": "^2.0.0",
+    "path": "^0.12.7",
+    "stripe": "^17.5.0",
+    "uuid": "^11.0.3"
+  }
+}
