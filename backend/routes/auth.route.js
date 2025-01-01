@@ -4,11 +4,10 @@ const authRouter = express.Router()
 const initializePassport = require('../config/passport')
 const {
   userRegister,
-  userLogin,
   adminRegister,
-  adminLogin
+  login
 } = require('../controller/auth.controller')
-const  upload  = require('../middleware/upload.middleware')
+const upload = require('../middleware/upload.middleware')
 
 // Google OAuth routes
 authRouter.get('/google', (req, res, next) => {
@@ -56,17 +55,6 @@ authRouter.post(
   }
 )
 
-// User login route
-authRouter.post('/login/user', async (req, res) => {
-  try {
-    const { email, password } = req.body
-    const user = await userLogin(email, password)
-    res.json({ message: 'User logged in successfully', user })
-  } catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-})
-
 // Admin registration route
 authRouter.post(
   '/register/admin',
@@ -84,17 +72,21 @@ authRouter.post(
     }
   }
 )
-
-// Admin login route
-authRouter.post('/login/admin', async (req, res) => {
+//login
+authRouter.post('/login', async (req, res) => {
+  const { email, password } = req.body
   try {
-    const { email, password } = req.body
-    const admin = await adminLogin(email, password)
-    res.json({ message: 'Admin logged in successfully', admin })
+    const { account, role } = await login(email, password)
+    res.status(200).json({
+      success: true,
+      message: `${
+        role.charAt(0).toUpperCase() + role.slice(1)
+      } logged in successfully`,
+      account
+    })
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    res.status(400).json({ success: false, message: error.message });
   }
 })
 
-
-module.exports = authRouter;
+module.exports = authRouter
