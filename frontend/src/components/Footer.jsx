@@ -36,7 +36,7 @@ const Footer = () => {
             <h2 className="text-xl font-semibold mb-4">Quick Links</h2>
             <div className="space-y- *:mr-3">
               <NavLink
-                to="/register"
+                to="/select-role"
                 className="text-indigo-600 hover:text-indigo-800 transition-colors"
               >
                 Register

@@ -25,11 +25,12 @@ authRouter.post('/google-login', async (req, res) => {
     }
 
     const user = await googleCallback(token, role, organization)
+    const webToken=generateWebToken(user.id);
     res.status(200).json({
       message: `Google login successful as a ${role}`,
       user,
       role,
-      token
+      token:webToken
     })
   } catch (error) {
     res

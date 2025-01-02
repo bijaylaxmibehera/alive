@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink,useNavigate } from "react-router-dom";
 import { SearchBox } from "./SearchBox";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
@@ -6,10 +6,14 @@ import { logout } from "../features/auth/authSlice";
 export const Navbar = () => {
   const dispatch = useDispatch();
   const { user, admin } = useSelector((state) => state.auth);
+  const navigate=useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
+    navigate("/")
   };
+  
+  
 
   return (
     <nav className="bg-pink-100 p-4 sticky top-0 z-10">
@@ -32,7 +36,7 @@ export const Navbar = () => {
         <div className="text-tekhelet flex space-x-6 font-medium text-lg">
           {user ? (
             <>
-              <NavLink to="/find-events" className="relative group">
+              <NavLink to="/events" className="relative group">
                 Find Events
                 <span className="absolute bottom-[-6px] left-0 w-0 h-[2px] bg-tekhelet transition-all duration-300 group-hover:w-full"></span>
               </NavLink>
@@ -50,11 +54,11 @@ export const Navbar = () => {
             </>
           ) : admin ? (
             <>
-              <NavLink to="/create-event" className="relative group">
+              <NavLink to={`/${admin.name}/create-event`} className="relative group">
                 Create Event
                 <span className="absolute bottom-[-6px] left-0 w-0 h-[2px] bg-tekhelet transition-all duration-300 group-hover:w-full"></span>
               </NavLink>
-              <NavLink to="/dashboard" className="relative group">
+              <NavLink to={`/${admin.name}/dashboard`} className="relative group">
                 Dashboard
                 <span className="absolute bottom-[-6px] left-0 w-0 h-[2px] bg-tekhelet transition-all duration-300 group-hover:w-full"></span>
               </NavLink>

@@ -1,7 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export const HeroSection = () => {
+  const navigate=useNavigate();
   return (
     <>
       <section className="flex flex-col lg:flex-row items-center justify-between px-6 lg:px-16 py-12 bg-gray-100">
@@ -15,8 +16,8 @@ export const HeroSection = () => {
             Alive transforms your events into unforgettable celebrations with
             seamless planning and impeccable execution
           </p>
-          <button className="bg-gradient-to-bl from-yellow-400 via-pink-500 to-red-500 text-ghost-white font-medium py-3 px-6 rounded-lg cursor-pointer transform hover:scale-105 hover:shadow-lg transition duration-300">
-            <Link to="/events">Get Started</Link>
+          <button className="bg-gradient-to-bl from-yellow-400 via-pink-500 to-red-500 text-ghost-white font-medium py-3 px-6 rounded-lg cursor-pointer transform hover:scale-105 hover:shadow-lg transition duration-300" onClick={()=>navigate('/events')}>
+            <p>Get Started</p>
           </button>
         </div>
 

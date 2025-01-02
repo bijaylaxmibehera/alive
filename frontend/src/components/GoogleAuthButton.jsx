@@ -11,9 +11,8 @@ const GoogleAuthButton = ({ role, organization }) => {
   const handleGoogleLogin =async (response) => {
     const token = response.credential; 
     try{
-     const result= await dispatch(googleLogin({ token, role,organization})); 
-     console.log(result);
-      navigate('/');
+     await dispatch(googleLogin({ token, role,organization})); 
+     navigate('/');
     }catch(error){
       console.error('Google login failed', error);
     }

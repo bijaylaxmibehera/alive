@@ -37,18 +37,15 @@ export const RegisterAdmin = () => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 flex items-center justify-center">
       <div className="bg-white shadow-md rounded-lg flex w-[50%] h-[80vh] overflow-hidden items-center justify-center">
-        {/* Form Container */}
         <div className="w-full max-w-md py-8 px-4">
           {/* Google Login Button */}
           <div className="flex flex-col items-center mb-6">
             <GoogleAuthButton role="admin" organization="TechCorp" />
             <p className="text-gray-600 mt-2">Or</p>
           </div>
-
+         {/* Manual register form */}
           <form onSubmit={registerFormHandler}>
-            {/* Organization Name and Full Name in the same line */}
             <div className="flex space-x-4 mb-4">
-              {/* Organization Name */}
               <div className="w-1/2">
                 <label
                   htmlFor="organization"
@@ -86,10 +83,7 @@ export const RegisterAdmin = () => {
                 />
               </div>
             </div>
-
-            {/* Email and Password in the same line */}
             <div className="flex space-x-4 mb-4">
-              {/* Email */}
               <div className="w-1/2">
                 <label
                   htmlFor="email"

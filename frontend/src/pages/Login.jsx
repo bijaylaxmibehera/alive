@@ -44,7 +44,7 @@ export const Login = () => {
               <img
                 src="https://res.cloudinary.com/bijaylaxmibehera/image/upload/v1735435552/undraw_welcome-cats_tw36_yz5ayd.png"
                 alt="Placeholder"
-                className="w-3/4"
+                className="w-full h-full object-fill"
               />
             </div>
 

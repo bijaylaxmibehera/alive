@@ -4,11 +4,13 @@ const app = express()
 const port = 3000
 const cors = require('cors')
 const helmet = require('helmet')
+const path = require('path');
 const bodyParser = require('body-parser')
 const { connectDB } = require('./config/connectDB')
 const authRouter = require('./routes/auth.route')
 const errorHandler= require("./middleware/errorHandler.middleware")
 const routeNotFound=require("./middleware/routeNotFound.middleware")
+const eventRouter = require('./routes/event.route')
 
 //middleware
 const allowedOrigins = ['http://localhost:5173'];
@@ -26,7 +28,7 @@ app.use(
   })
 );
 
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(helmet())
 app.use(express.json())
 app.use(bodyParser.json())
@@ -41,6 +43,7 @@ app.get('/', (req, res) => {
 
 //routes
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/events', eventRouter)
 
 //middleware
 app.use(routeNotFound)

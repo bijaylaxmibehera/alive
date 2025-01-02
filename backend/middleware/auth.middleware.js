@@ -13,7 +13,7 @@ const authenticateUser = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.userId);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -37,7 +37,7 @@ const authenticateAdmin = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const admin = await Admin.findById(decoded.id);
+    const admin = await Admin.findById(decoded.userId);
 
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });

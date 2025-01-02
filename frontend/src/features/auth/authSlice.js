@@ -124,13 +124,12 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false
         state.token = action.payload.token
-
         if (action.payload.role === 'user') {
-          state.user = action.payload.user || null
-          localStorage.setItem('user', JSON.stringify(action.payload.user))
+          state.user = action.payload.account || null
+          localStorage.setItem('user', JSON.stringify(action.payload.account))
         } else if (action.payload.role === 'admin') {
-          state.admin = action.payload.admin || null
-          localStorage.setItem('admin', JSON.stringify(action.payload.admin))
+          state.admin = action.payload.account || null
+          localStorage.setItem('admin', JSON.stringify(action.payload.account))
         }
         localStorage.setItem('token', action.payload.token)
       })
