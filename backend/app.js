@@ -11,7 +11,22 @@ const errorHandler= require("./middleware/errorHandler.middleware")
 const routeNotFound=require("./middleware/routeNotFound.middleware")
 
 //middleware
-app.use(cors())
+const allowedOrigins = ['http://localhost:5173'];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
+
+
 app.use(helmet())
 app.use(express.json())
 app.use(bodyParser.json())

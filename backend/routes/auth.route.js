@@ -1,41 +1,42 @@
 const express = require('express')
-const passport = require('passport')
 const authRouter = express.Router()
-const initializePassport = require('../config/passport')
 const {
+  googleCallback,
   userRegister,
   adminRegister,
   login
 } = require('../controller/auth.controller')
 const upload = require('../middleware/upload.middleware')
+const { generateWebToken } = require('../utils/utils')
 
-// Google OAuth routes
-authRouter.get('/google', (req, res, next) => {
-  const { clientID, clientSecret } = req.query
+authRouter.post('/google-login', async (req, res) => {
+  try {
+    const { token, role } = req.body
+    const organization = req.body.organization || undefined
 
-  if (!clientID || !clientSecret) {
-    return res
-      .status(400)
-      .json({ message: 'Google Client ID and Secret are required' })
+    if (!token || !role) {
+      return res.status(400).json({ message: 'Token and role are required.' })
+    }
+
+    if (role === 'admin' && !organization) {
+      return res
+        .status(400)
+        .json({ message: 'Organization name is required for admin.' })
+    }
+
+    const user = await googleCallback(token, role, organization)
+    res.status(200).json({
+      message: `Google login successful as a ${role}`,
+      user,
+      role,
+      token
+    })
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'Google login failed.', error: error.message })
   }
-
-  initializePassport(clientID, clientSecret)
-
-  passport.authenticate('google', { scope: ['profile', 'email'] })(
-    req,
-    res,
-    next
-  )
 })
-
-authRouter.get(
-  '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  (req, res) => {
-    const user = req.user
-    res.json({ message: 'Authenticated successfully', user })
-  }
-)
 
 // User registration route
 authRouter.post(
@@ -46,9 +47,10 @@ authRouter.post(
       const profilePicture = req.file ? `/uploads/${req.file.filename}` : null
       const userData = { ...req.body, profilePicture }
       const newUser = await userRegister(userData)
+      const token = generateWebToken(newUser._id)
       res
         .status(201)
-        .json({ message: 'User registered successfully', user: newUser })
+        .json({ message: 'User registered successfully', user: newUser, token })
     } catch (error) {
       res.status(400).json({ message: error.message })
     }
@@ -64,9 +66,12 @@ authRouter.post(
       const profilePicture = req.file ? `/uploads/${req.file.filename}` : null
       const adminData = { ...req.body, profilePicture }
       const newAdmin = await adminRegister(adminData)
-      res
-        .status(201)
-        .json({ message: 'Admin registered successfully', admin: newAdmin })
+      const token = generateWebToken(newAdmin._id)
+      res.status(201).json({
+        message: 'Admin registered successfully',
+        admin: newAdmin,
+        token
+      })
     } catch (error) {
       res.status(400).json({ message: error.message })
     }
@@ -77,15 +82,18 @@ authRouter.post('/login', async (req, res) => {
   const { email, password } = req.body
   try {
     const { account, role } = await login(email, password)
+    const token = generateWebToken(account._id)
     res.status(200).json({
       success: true,
       message: `${
         role.charAt(0).toUpperCase() + role.slice(1)
       } logged in successfully`,
-      account
+      account,
+      role,
+      token
     })
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: error.message })
   }
 })
 

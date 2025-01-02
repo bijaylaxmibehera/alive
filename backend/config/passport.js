@@ -1,63 +1,64 @@
-const passport = require('passport')
-const GoogleStrategy = require('passport-google-oauth').Strategy
-const User = require('../models/user.model')
-const Admin = require('../models/admin.model')
+const passport = require('passport');
+const { OAuth2Client } = require('google-auth-library');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const User = require('../models/user.model');
+const Admin = require('../models/admin.model');
 
-module.exports = (clientID, clientSecret) => {
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID,
-        clientSecret,
-        callbackURL: '/auth/google/callback'
-      },
-      async (accessToken, refreshToken, profile, done) => {
-        try {
-          const { email, name, picture, sub } = profile._json
+const client = new OAuth2Client();
 
-          let user =
-            (await User.findOne({ googleId: sub })) ||
-            (await Admin.findOne({ googleId: sub }))
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID, 
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: '/auth/google/callback',
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const { email, name, picture, sub: googleId } = profile._json;
+
+        let user;
+        if (profile.role === 'admin') {
+          user = await Admin.findOne({ googleId });
           if (!user) {
-            user =
-              (await User.findOne({ email })) ||
-              (await Admin.findOne({ email }))
+            user = new Admin({
+              name,
+              email,
+              googleId,
+              profilePicture: picture,
+            });
+            await user.save();
           }
-
+        } else {
+          user = await User.findOne({ googleId });
           if (!user) {
             user = new User({
               name,
               email,
-              googleId: sub,
-              profilePicture: picture
-            })
-            await user.save()
-          } else {
-            user.googleId = sub
-            user.profilePicture = picture
-            await user.save()
+              googleId,
+              profilePicture: picture,
+            });
+            await user.save();
           }
-
-          return done(null, user)
-        } catch (error) {
-          return done(error, null)
         }
+
+        done(null, user);
+      } catch (error) {
+        done(error, null);
       }
-    )
-  )
-
-  passport.serializeUser((user, done) => {
-    done(null, { id: user._id, type: user instanceof User ? 'User' : 'Admin' })
-  })
-
-  passport.deserializeUser(async (obj, done) => {
-    try {
-      const { id, type } = obj
-      const model = type === 'User' ? User : Admin
-      const user = await model.findById(id)
-      done(null, user)
-    } catch (error) {
-      done(error, null)
     }
-  })
-}
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, { id: user._id, type: user instanceof Admin ? 'Admin' : 'User' });
+});
+
+passport.deserializeUser(async (obj, done) => {
+  const model = obj.type === 'User' ? User : Admin;
+  const user = await model.findById(obj.id);
+  done(null, user);
+});
+
+module.exports = passport;

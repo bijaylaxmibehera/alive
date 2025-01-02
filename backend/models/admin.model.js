@@ -4,7 +4,6 @@ const adminSchema = new mongoose.Schema(
   {
     organization: {
       type: String,
-      required: true
     },
     name: {
       type: String,

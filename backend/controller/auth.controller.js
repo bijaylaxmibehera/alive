@@ -1,8 +1,58 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
+const { OAuth2Client } = require('google-auth-library')
 const User = require('../models/user.model')
 const Admin = require('../models/admin.model')
 const { generateHashedPassword } = require('../utils/utils')
+
+//social logins
+const client = new OAuth2Client()
+
+const googleCallback = async (token, role, organization) => {
+  try {
+    const googleResponse = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = googleResponse.getPayload();
+    const { email, name, picture, sub: googleId } = payload;
+
+    let user;
+
+    if (role === 'admin') {
+      user = await Admin.findOne({ googleId });
+      if (!user) {
+        // Create new admin if not found
+        user = new Admin({
+          name,
+          email,
+          organization,
+          googleId,
+          profilePicture: picture,
+        });
+        user = await user.save();
+      }
+    } else {
+      user = await User.findOne({ googleId });
+      if (!user) {
+        // Create new user if not found
+        user = new User({
+          name,
+          email,
+          googleId,
+          profilePicture: picture,
+        });
+        user = await user.save();
+      }
+    }
+    return user;
+  } catch (error) {
+    console.error('Google callback error:', error.message);
+    throw new Error('Google authentication failed.');
+  }
+};
+
 
 //User  register
 const userRegister = async userData => {
@@ -86,4 +136,4 @@ const login = async (email, password) => {
   }
 }
 
-module.exports = { userRegister, adminRegister, login }
+module.exports = { googleCallback, userRegister, adminRegister, login }
